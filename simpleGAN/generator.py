@@ -4,7 +4,7 @@ import numpy as np
 from keras.layers import Dense, Reshape, BatchNormalization 
 from keras.layers.advanced_activations import LeakyReLU 
 from keras.models import Sequential, Model
-from Keras.optimizers import Adam 
+from keras.optimizers import Adam 
 
 
 class Generator(object):
@@ -31,7 +31,7 @@ class Generator(object):
             model.add(LeakyReLU(alpha=0.2))
             model.add(BatchNormalization(momentum=0.8))
         model.add(Dense(self.W*self.H*self.C,activation = 'tanh'))
-        model.add(Reshape((self.W,self,H,self.C)))
+        model.add(Reshape((self.W,self.H,self.C)))
         return model
     
     def summary(self):

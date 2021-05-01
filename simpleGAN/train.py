@@ -36,9 +36,10 @@ class Trainer:
         if self.model_type !=-1: 
             self.X_train = self.X_train[np.where(self.Y_train==int(self.model_type))[0]]
         
-        self.X_train = (np.float(self.X_train) - 127.5)/127.5
+        vector = np.vectorize(np.float)
+        self.X_train = (vector(self.X_train) - 127.5)/127.5
         self.X_train = np.expand_dims(self.X_train,axis=3)
-        return X_train
+        return self.X_train
     
     def train(self):
         for e in range(self.EPOCHS):
@@ -47,7 +48,7 @@ class Trainer:
             starting_index = randint(0,len(self.X_train)-count_real_images)
 
             real_images_raw = self.X_train[starting_index:starting_index+count_real_images]
-            x_real_images = real_images_raw.reshape(count_real_images,self.W,self,H,self.C)
+            x_real_images = real_images_raw.reshape(count_real_images,self.W,self.H,self.C)
             y_real_labels = np.ones([count_real_images,1])
 
             #load generated Images 
@@ -76,7 +77,7 @@ class Trainer:
         return np.random.normal(0,1,(instances,self.LATENT_SPACE_SIZE))
 
     def plot_checkpoint(self,e):
-        filename = "/data/sample_"+str(e)+".png"
+        filename = "data/sample_"+str(e)+".png"
         
         noise = self.sample_latent_space(16) 
         images = self.generator.Generator.predict(noise)
@@ -87,6 +88,6 @@ class Trainer:
             image = np.reshape(image,[self.H,self.W])
             plt.imshow(image,cmap='gray')
             plt.axis('off')
-            plt.tight_layout() 
-            plt.savefig(filename)
-            plt.close('all')
+        plt.tight_layout() 
+        plt.savefig(filename)
+        plt.close('all')
