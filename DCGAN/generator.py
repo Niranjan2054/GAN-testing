@@ -1,10 +1,11 @@
 #!/urs/bin/env python3 
 import sys 
 import numpy as np 
-from keras.layers import Dense, Reshape, BatchNormalization , UpSampleing2D,Convolution2D
+from keras.layers import Dense, Reshape, BatchNormalization , UpSampling2D, Convolution2D
 from keras.layers.advanced_activations import LeakyReLU 
 from keras.models import Sequential, Model
 from keras.optimizers import Adam 
+from keras.utils import plot_model
 
 
 class Generator(object):
@@ -18,7 +19,7 @@ class Generator(object):
             self.OPTIMIZER = Adam(lr=.0002,decay=8e-9)
             self.Generator = self.model()
             self.Generator.compile(loss="binary_crossentropy",optimizer=self.OPTIMIZER)
-        elif model_type="DCGAN": 
+        elif model_type=="DCGAN": 
             self.Generator = self.dc_model() 
             self.OPTIMIZER = Adam(lr=1e-4,beta_1=0.2)
             self.Generator.compile(loss="binary_crossentropy",optimizer=self.OPTIMIZER,metrics=['accuracy'])
@@ -43,20 +44,20 @@ class Generator(object):
     def dc_model(self):
         model = Sequential() 
        
-        model.add(Desnse(256*8*8,activation=LeakyReLU(0.2),input_dim=self.LATENT_SPACE_SIZE))
+        model.add(Dense(256*8*8,activation=LeakyReLU(0.2),input_dim=self.LATENT_SPACE_SIZE))
         model.add(BatchNormalization())
         model.add(Reshape((8,8,256)))
-        model.add(UpSampleing2D())
+        model.add(UpSampling2D())
 
-        model.add(Convolution2D(128,5,5,border_mode='same',activation=LeakyReLU(0.2)))
+        model.add(Convolution2D(128,5,padding='same',activation=LeakyReLU(0.2)))
         model.add(BatchNormalization())
-        model.add(UpSampleing2D())
+        model.add(UpSampling2D())
 
-        model.add(Convolution2D(64,5,5,border_mode='same',activation=LeakyReLU(0.2)))
+        model.add(Convolution2D(64,5,padding='same',activation=LeakyReLU(0.2)))
         model.add(BatchNormalization())
-        model.add(UpSampleing2D())
+        model.add(UpSampling2D())
 
-        model.add(Convolution2D(self.C,5,5,border_mode='same',activation='tanh'))
+        model.add(Convolution2D(self.C,5,padding='same',activation='tanh'))
         return model 
 
 
@@ -65,5 +66,6 @@ class Generator(object):
         return self.Generator.summary()
 
     def save_model(self):
-        plot_model(self.Generator.model,to_file='/data/Generator_Model.png')
+        pass
+        # plot_model(self.Generator.model(),to_file='/data/Generator_Model.png')
 

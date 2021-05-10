@@ -1,7 +1,7 @@
 #!/urs/bin/env python3 
 import sys 
 import numpy as np 
-from keras.layers import Input, Dense, Reshape, Flatten, Dropout ,Convolution2D,BatchNormalization
+from keras.layers import Input, Dense, Reshape, Flatten, Dropout ,Conv2D,BatchNormalization
 from keras.layers.advanced_activations import LeakyReLU 
 from keras.models import Sequential, Model
 from keras.optimizers import Adam 
@@ -19,7 +19,7 @@ class Discriminator(object):
             self.Discriminator = self.model() 
             self.OPTIMIZER = Adam(lr=0.0002, decay=8e-9)
             self.Discriminator.compile(loss='binary_crossentropy',optimizer=self.OPTIMIZER,metrics=['accuracy'])
-        elif model_type="DCGAN": 
+        elif model_type=="DCGAN": 
             self.Discriminator = self.dc_model()
             self.OPTIMIZER = Adam(lr=1e-4,beta_1=0.2)
             self.Discriminator.compile(loss='binary_crossentropy',optimizer=self.OPTIMIZER,metrics=['accuracy'])
@@ -39,11 +39,11 @@ class Discriminator(object):
     def dc_model(self):
         model = Sequential() 
 
-        model.add(Convolution2D(64,5,5,subsample=(2,2),input_shape=(self.W,self.H,self.C),border_mode="same",activation=LeakyReLU(0.2)))
+        model.add(Conv2D(64,5,5,input_shape=(self.W,self.H,self.C),padding="same",activation=LeakyReLU(0.2)))
         model.add(Dropout(0.3))
         model.add(BatchNormalization())
 
-        model.add(Convolution2D(128,5,5,subsample=(2,2),border_mode="same",activation=LeakyReLU(0.2)))
+        model.add(Conv2D(128,5,5,padding="same",activation=LeakyReLU(0.2)))
         model.add(Dropout(0.3))
         model.add(BatchNormalization())
 
@@ -56,4 +56,5 @@ class Discriminator(object):
         return self.Discriminator.summary()
 
     def save_model(self):
-        plot_model(self.Discriminator.model,to_file='/data/Discriminator_Model.png')
+        pass
+        # plot_model(self.Discriminator.model,to_file='/data/Discriminator_Model.png')

@@ -22,11 +22,11 @@ class Trainer:
         self.generator = Generator(width=self.W,height=self.H,channels=self.C,latent_size=self.LATENT_SPACE_SIZE,model_type=self.model_type)
 
         self.discriminator = Discriminator(width=self.W,height=self.H,channels=self.C,model_type=self.model_type)
-        self.gan = GAN(self.discriminator.Discriminator,self.generator.Generator)
+        self.gan_model = GAN(self.discriminator.Discriminator,self.generator.Generator)
         
         if self.model_type=="simple":
             self.load_MNIST()
-        elif self.model_type="DCGAN":
+        elif self.model_type=="DCGAN":
             self.load_npy(data_path)
 
     def load_npy(self,npy_path,amount_of_data=0.25):
@@ -85,6 +85,7 @@ class Trainer:
     
 
     def dc_train(self):
+        generated_loss=0
         for e in range(self.EPOCHS):
             b = 0 
             X_train_temp = deepcopy(self.X_train)
@@ -114,8 +115,7 @@ class Trainer:
                 else:
                     y_generated_labels = np.zeros([self.BATCH,1])
                     x_latent_space_samples = self.sample_latent_space(self.BATCH)
-                    generated_loss = self.gan_model.train_on_batch(x_latent_space_samples,y_generated_labels)
-
+                    generated_loss = self.gan_model.gan_model.train_on_batch(x_latent_space_samples,y_generated_labels)
                 print('Batch: '+str(b)+', [Discriminator :: Loss : '+str(discriminator_loss)+' ], [Generator :: Loss : '+str(generated_loss)+' ]')
                 if  b % self.CHECKPOINT == 0:
                     label = str(e)+"_"+str(b)
@@ -137,7 +137,7 @@ class Trainer:
         for i in range(images.shape[0]):
             plt.subplot(4,4,i+1)
             image = images[i,:,:,:]
-            image = np.reshape(image,[self.H,self.W])
+            image = np.reshape(image,[self.H,self.W,self.C])
             plt.imshow(image,cmap='gray')
             plt.axis('off')
         plt.tight_layout() 
